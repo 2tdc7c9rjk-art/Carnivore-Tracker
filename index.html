@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Mi Registro">
+<title>Mi Registro Carnívoro</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  body { font-family: -apple-system, 'Helvetica Neue', Arial, sans-serif; background: #F2F2F7; color: #000; -webkit-font-smoothing: antialiased; min-height: 100vh; }
+  input, textarea, select { font-family: -apple-system, 'Helvetica Neue', Arial, sans-serif; font-size: 17px; color: #000; background: transparent; border: none; outline: none; width: 100%; }
+  input[type="time"] { color: #007AFF; text-align: right; }
+  button { font-family: -apple-system, 'Helvetica Neue', Arial, sans-serif; cursor: pointer; }
+  .card { background: #fff; border-radius: 12px; overflow: hidden; }
+  .sep { height: 0.5px; background: rgba(60,60,67,0.18); margin-left: 16px; }
+  .section-label { font-size: 13px; font-weight: 600; color: #6C6C70; text-transform: uppercase; letter-spacing: 0.4px; display: block; padding: 16px 0 6px; }
+  .row { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; background: #fff; min-height: 44px; gap: 12px; }
+  .input-row { display: flex; align-items: center; background: #fff; padding-right: 16px; }
+  .input-row span { font-size: 20px; padding: 0 10px 0 14px; flex-shrink: 0; }
+  .input-row input { padding: 13px 0; flex: 1; }
+  .time-row { display: flex; align-items: center; background: #fff; padding-right: 16px; }
+  .time-row .icon { font-size: 20px; padding: 0 10px 0 14px; flex-shrink: 0; }
+  .time-row .lbl { font-size: 15px; color: #3C3C43; padding: 13px 12px 13px 0; flex-shrink: 0; min-width: 100px; }
+  .time-row input { padding: 13px 0; }
+  .btn-primary { width: 100%; padding: 14px; border: none; border-radius: 12px; font-size: 17px; font-weight: 600; color: #fff; background: #FF3B30; }
+  .btn-blue { width: 100%; padding: 14px; border: none; border-radius: 12px; font-size: 17px; font-weight: 600; color: #fff; background: #007AFF; }
+  .btn-ghost { width: 100%; padding: 14px; border: none; border-radius: 12px; font-size: 17px; font-weight: 400; color: #FF3B30; background: #fff; }
+  .btn-ai { width: 100%; padding: 14px; border: none; border-radius: 12px; font-size: 17px; font-weight: 600; color: #fff; background: linear-gradient(135deg, #5856D6, #007AFF); margin-bottom: 10px; }
+  .seg { display: flex; background: rgba(118,118,128,0.12); border-radius: 9px; padding: 2px; gap: 2px; }
+  .seg-btn { flex: 1; padding: 7px 4px; border: none; border-radius: 7px; font-size: 13px; font-weight: 600; color: #3C3C43; background: transparent; }
+  .seg-btn.active { background: #fff; color: #000; box-shadow: 0 1px 3px rgba(0,0,0,0.12); }
+  .chevron { flex-shrink: 0; }
+  #view-main, #view-edit { display: none; }
+  .page { max-width: 480px; margin: 0 auto; padding-bottom: 40px; }
+  .sticky-nav { display: flex; justify-content: space-between; align-items: center; padding: 16px 16px 8px; background: #F2F2F7; position: sticky; top: 0; z-index: 10; }
+  .nav-btn { background: none; border: none; font-size: 17px; padding: 0; }
+  .score-card { border-radius: 12px; padding: 20px; margin-bottom: 8px; text-align: center; }
+  .analysis-section { background: #fff; border-radius: 12px; padding: 16px; margin-bottom: 8px; }
+  .analysis-tip { background: #F0F8FF; border-radius: 12px; padding: 16px; border: 1px solid rgba(0,122,255,0.15); }
+  .energy-option { display: flex; justify-content: space-between; align-items: center; padding: 13px 16px; cursor: pointer; }
+  .energy-option.active span { font-weight: 600; }
+  .hist-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; cursor: pointer; gap: 12px; }
+  .today-badge { font-size: 10px; font-weight: 700; background: #FF3B30; color: #fff; border-radius: 5px; padding: 2px 6px; }
+  textarea { resize: none; line-height: 1.5; display: block; padding: 13px 16px; min-height: 90px; }
+</style>
+</head>
+<body>
+
+<!-- MAIN VIEW -->
+<div id="view-main">
+  <div class="page">
+    <div style="padding: 52px 16px 12px">
+      <p style="font-size:13px;font-weight:600;color:#FF3B30;margin-bottom:4px" id="day-label">Plan Carnívoro · Día 1</p>
+      <h1 style="font-size:34px;font-weight:700;letter-spacing:-0.5px;color:#000;line-height:1.1;margin-bottom:6px">Mi Registro</h1>
+      <p style="font-size:15px;color:#8E8E93;text-transform:capitalize" id="date-long"></p>
+    </div>
+
+    <!-- Stats -->
+    <div style="padding:0 16px 12px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
+      <div class="card" style="padding:14px 12px;text-align:center">
+        <p style="font-size:11px;color:#8E8E93;font-weight:600;letter-spacing:0.3px;margin-bottom:4px;text-transform:uppercase">Peso</p>
+        <p style="font-size:22px;font-weight:700;letter-spacing:-0.5px;color:#000" id="stat-weight">170</p>
+        <p style="font-size:11px;color:#C7C7CC;margin-top:2px">kg</p>
+      </div>
+      <div class="card" style="padding:14px 12px;text-align:center">
+        <p style="font-size:11px;color:#8E8E93;font-weight:600;letter-spacing:0.3px;margin-bottom:4px;text-transform:uppercase">Perdido</p>
+        <p style="font-size:22px;font-weight:700;letter-spacing:-0.5px;color:#8E8E93" id="stat-lost">—</p>
+        <p style="font-size:11px;color:#C7C7CC;margin-top:2px">kg</p>
+      </div>
+      <div class="card" style="padding:14px 12px;text-align:center">
+        <p style="font-size:11px;color:#8E8E93;font-weight:600;letter-spacing:0.3px;margin-bottom:4px;text-transform:uppercase">Días</p>
+        <p style="font-size:22px;font-weight:700;letter-spacing:-0.5px;color:#007AFF" id="stat-days">0</p>
+        <p style="font-size:11px;color:#C7C7CC;margin-top:2px">reg.</p>
+      </div>
+    </div>
+
+    <!-- Progress -->
+    <div style="padding:0 16px 12px">
+      <div class="card" style="padding:14px 16px">
+        <div style="display:flex;justify-content:space-between;margin-bottom:8px">
+          <p style="font-size:15px;font-weight:600;color:#000">Meta diciembre</p>
+          <p style="font-size:15px;color:#FF3B30;font-weight:600" id="progress-label">0 / 40 kg</p>
+        </div>
+        <div style="background:#E5E5EA;border-radius:100px;height:4px;overflow:hidden">
+          <div style="height:100%;width:0%;background:linear-gradient(90deg,#FF3B30,#FF9500);border-radius:100px;transition:width 0.8s" id="progress-bar"></div>
+        </div>
+        <p style="font-size:12px;color:#C7C7CC;margin-top:6px" id="progress-sub">0% · 40 kg restantes</p>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div style="padding:0 16px 14px">
+      <div class="seg">
+        <button class="seg-btn active" onclick="switchTab('hoy',this)">Hoy</button>
+        <button class="seg-btn" onclick="switchTab('historial',this)">Historial</button>
+        <button class="seg-btn" onclick="switchTab('grafica',this)">Gráfica</button>
+      </div>
+    </div>
+
+    <div style="padding:0 16px">
+      <!-- TAB HOY -->
+      <div id="tab-hoy">
+        <!-- Sueño ayer -->
+        <div class="card" style="margin-bottom:12px" onclick="openEdit(getYesterday())">
+          <div class="row" style="cursor:pointer">
+            <div style="display:flex;align-items:center;gap:10px">
+              <span style="font-size:20px">🌙</span>
+              <div>
+                <p style="font-size:15px;color:#000">¿A qué hora dormí ayer?</p>
+                <p style="font-size:12px;color:#8E8E93">Completa el registro de ayer</p>
+              </div>
+            </div>
+            <div style="display:flex;align-items:center;gap:4px">
+              <span style="font-size:14px;font-weight:600" id="yesterday-sleep"></span>
+              <svg width="7" height="12" viewBox="0 0 7 12" fill="none"><path d="M1 1L6 6L1 11" stroke="#C7C7CC" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+          </div>
+        </div>
+
+        <!-- Registro hoy -->
+        <div id="today-empty" class="card" style="padding:40px 20px;text-align:center;margin-bottom:12px">
+          <p style="font-size:48px;margin-bottom:12px">🥩</p>
+          <p style="font-size:17px;font-weight:600;color:#000;margin-bottom:6px">Sin registrar aún</p>
+          <p style="font-size:15px;color:#8E8E93">Puedes ir agregando durante el día</p>
+        </div>
+        <div id="today-filled" class="card" style="margin-bottom:12px;display:none">
+          <div style="padding:12px 16px;display:flex;justify-content:space-between"><span style="font-size:15px;color:#3C3C43">⚖️ Peso</span><span style="font-size:15px;font-weight:600;color:#FF3B30" id="td-weight">—</span></div>
+          <div class="sep"></div>
+          <div style="padding:12px 16px;display:flex;justify-content:space-between"><span style="font-size:15px;color:#3C3C43">💧 Agua</span><span style="font-size:15px;color:#8E8E93" id="td-water">—</span></div>
+          <div class="sep"></div>
+          <div style="padding:12px 16px;display:flex;justify-content:space-between;gap:12px"><span style="font-size:15px;color:#3C3C43;flex-shrink:0">🍳 Desayuno</span><span style="font-size:15px;color:#8E8E93;text-align:right" id="td-breakfast">—</span></div>
+          <div class="sep"></div>
+          <div style="padding:12px 16px;display:flex;justify-content:space-between;gap:12px"><span style="font-size:15px;color:#3C3C43;flex-shrink:0">🥩 Almuerzo</span><span style="font-size:15px;color:#8E8E93;text-align:right" id="td-lunch">—</span></div>
+          <div class="sep"></div>
+          <div style="padding:12px 16px;display:flex;justify-content:space-between"><span style="font-size:15px;color:#3C3C43">🔋 Energía</span><span style="font-size:15px;color:#8E8E93" id="td-energy">—</span></div>
+          <div class="sep"></div>
+          <div style="padding:12px 16px;display:flex;justify-content:space-between"><span style="font-size:15px;color:#3C3C43">☀️ Me levanté</span><span style="font-size:15px;color:#8E8E93" id="td-wakeup">—</span></div>
+          <div class="sep"></div>
+          <div style="padding:12px 16px;display:flex;justify-content:space-between"><span style="font-size:15px;color:#3C3C43">😴 Sueño</span><span style="font-size:15px;color:#8E8E93" id="td-sleep">—</span></div>
+          <div id="td-notes-row" style="display:none">
+            <div class="sep"></div>
+            <div style="padding:12px 16px;display:flex;justify-content:space-between;gap:12px"><span style="font-size:15px;color:#3C3C43;flex-shrink:0">📝 Notas</span><span style="font-size:15px;color:#8E8E93;text-align:right" id="td-notes">—</span></div>
+          </div>
+        </div>
+
+        <!-- Botón IA -->
+        <div id="ai-btn-container" style="display:none">
+          <button class="btn-ai" onclick="runAnalysis()">✨ Analizar mi día con IA</button>
+        </div>
+        <div id="ai-loading" style="display:none" class="card" style="padding:24px 20px;text-align:center;margin-bottom:12px">
+          <p style="font-size:36px;margin-bottom:12px">🤔</p>
+          <p style="font-size:15px;color:#8E8E93">Revisando tu registro...</p>
+        </div>
+        <div id="ai-result" style="display:none;margin-bottom:12px"></div>
+
+        <button class="btn-primary" onclick="openEdit(getToday())" id="btn-register">Registrar hoy</button>
+      </div>
+
+      <!-- TAB HISTORIAL -->
+      <div id="tab-historial" style="display:none">
+        <span class="section-label">Últimos 30 días</span>
+        <div class="card" id="hist-list"></div>
+      </div>
+
+      <!-- TAB GRÁFICA -->
+      <div id="tab-grafica" style="display:none">
+        <div id="chart-empty" class="card" style="padding:52px 20px;text-align:center">
+          <p style="font-size:48px;margin-bottom:14px">📈</p>
+          <p style="font-size:17px;font-weight:600;color:#000;margin-bottom:6px">Tu progreso te espera</p>
+          <p style="font-size:15px;color:#8E8E93">Registra al menos 2 días</p>
+        </div>
+        <div id="chart-filled" class="card" style="padding:20px 16px;display:none">
+          <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:20px">
+            <div>
+              <p style="font-size:13px;color:#8E8E93;text-transform:uppercase;letter-spacing:0.3px;margin-bottom:2px">Evolución de peso</p>
+              <p style="font-size:22px;font-weight:700;letter-spacing:-0.5px;color:#000" id="chart-current">170 kg</p>
+            </div>
+            <div id="chart-lost-badge" style="display:none;background:rgba(52,199,89,0.1);border-radius:10px;padding:6px 12px">
+              <p style="font-size:15px;font-weight:700;color:#34C759" id="chart-lost-val"></p>
+            </div>
+          </div>
+          <svg id="chart-svg" viewBox="0 0 300 140" style="width:100%;height:140px"></svg>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:16px;padding-top:16px;border-top:0.5px solid #E5E5EA">
+            <div style="text-align:center"><p style="font-size:11px;color:#C7C7CC;font-weight:500;text-transform:uppercase;letter-spacing:0.3px;margin-bottom:4px">Inicio</p><p style="font-size:16px;font-weight:700;color:#8E8E93">170 kg</p></div>
+            <div style="text-align:center"><p style="font-size:11px;color:#C7C7CC;font-weight:500;text-transform:uppercase;letter-spacing:0.3px;margin-bottom:4px">Perdido</p><p style="font-size:16px;font-weight:700" id="chart-lost-stat" style="color:#C7C7CC">—</p></div>
+            <div style="text-align:center"><p style="font-size:11px;color:#C7C7CC;font-weight:500;text-transform:uppercase;letter-spacing:0.3px;margin-bottom:4px">Actual</p><p style="font-size:16px;font-weight:700;color:#000" id="chart-actual-stat">170 kg</p></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- EDIT VIEW -->
+<div id="view-edit">
+  <div class="page">
+    <div class="sticky-nav">
+      <button class="nav-btn" style="color:#FF3B30" onclick="showMain()">← Cancelar</button>
+      <p style="font-size:17px;font-weight:600;color:#000" id="edit-date-title"></p>
+      <button class="nav-btn" style="color:#007AFF;font-weight:600" onclick="saveEntry()">Listo</button>
+    </div>
+    <div style="padding:0 16px 40px">
+      <span class="section-label">Métricas</span>
+      <div class="card">
+        <div class="input-row"><span>⚖️</span><input type="number" step="0.1" placeholder="Peso en kg (ej: 167.5)" id="f-weight"></div>
+        <div class="sep"></div>
+        <div class="input-row"><span>💧</span><input type="number" step="0.1" placeholder="Agua en litros (ej: 2.5)" id="f-water"></div>
+      </div>
+
+      <span class="section-label">Comidas del día</span>
+      <div class="card">
+        <div class="input-row"><span>🍳</span><input type="text" placeholder="Desayuno · 11:00 AM" id="f-breakfast"></div>
+        <div class="sep"></div>
+        <div class="input-row"><span>🥩</span><input type="text" placeholder="Almuerzo · 3:00 PM" id="f-lunch"></div>
+      </div>
+
+      <span class="section-label">Sueño</span>
+      <div class="card">
+        <div class="time-row"><span class="icon">🌙</span><span class="lbl">Me dormí</span><input type="time" id="f-bedtime" oninput="updateSleepCalc()"></div>
+        <div class="sep"></div>
+        <div class="time-row"><span class="icon">☀️</span><span class="lbl">Me levanté</span><input type="time" id="f-wakeup" oninput="updateSleepCalc()"></div>
+        <div id="sleep-calc" style="display:none">
+          <div class="sep"></div>
+          <div style="padding:13px 16px;display:flex;justify-content:space-between;align-items:center">
+            <span style="font-size:15px;color:#3C3C43">😴 Horas dormidas</span>
+            <span style="font-size:15px;font-weight:600;color:#34C759" id="sleep-calc-val"></span>
+          </div>
+        </div>
+      </div>
+
+      <span class="section-label">Energía del día</span>
+      <div class="card" id="energy-list"></div>
+
+      <span class="section-label">Notas</span>
+      <div class="card">
+        <textarea placeholder="¿Cómo te sentiste hoy? ¿Algo notable?" id="f-notes"></textarea>
+      </div>
+
+      <div style="margin-top:20px">
+        <button class="btn-blue" onclick="saveEntry()">Guardar registro</button>
+      </div>
+      <div style="margin-top:10px" id="delete-btn-container" style="display:none">
+        <button class="btn-ghost" onclick="deleteEntry()">Eliminar registro</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const START_WEIGHT = 170;
+const START_DATE = "2026-06-03";
+const GOAL_LOSS = 40;
+const STORAGE_KEY = "carnivore-v1";
+const ENERGY_OPTIONS = [
+  { label: "Excelente", emoji: "🔥", color: "#34C759" },
+  { label: "Bien",      emoji: "😊", color: "#007AFF" },
+  { label: "Regular",   emoji: "😐", color: "#FF9500" },
+  { label: "Bajo",      emoji: "😴", color: "#FF3B30" },
+];
+
+let entries = {};
+let currentEditDate = "";
+let selectedEnergy = "";
+
+function getToday() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+function getYesterday() {
+  const d = new Date(); d.setDate(d.getDate()-1);
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+function getDaysBetween(a,b) {
+  return Math.floor((new Date(b+"T12:00:00")-new Date(a+"T12:00:00"))/86400000);
+}
+function formatDateLong(d) {
+  return new Date(d+"T12:00:00").toLocaleDateString("es-CO",{weekday:"long",month:"long",day:"numeric"});
+}
+function formatDateShort(d) {
+  return new Date(d+"T12:00:00").toLocaleDateString("es-CO",{weekday:"short",day:"numeric",month:"short"});
+}
+function sleepHours(bed,wake) {
+  if(!bed||!wake) return null;
+  const [bh,bm]=bed.split(":").map(Number);
+  const [wh,wm]=wake.split(":").map(Number);
+  let m=(wh*60+wm)-(bh*60+bm);
+  if(m<0) m+=1440;
+  return (m/60).toFixed(1);
+}
+
+function loadEntries() {
+  try { const s=localStorage.getItem(STORAGE_KEY); if(s) entries=JSON.parse(s); } catch(e){}
+}
+function saveEntries() {
+  try { localStorage.setItem(STORAGE_KEY,JSON.stringify(entries)); } catch(e){}
+}
+
+function showMain() {
+  document.getElementById("view-edit").style.display="none";
+  document.getElementById("view-main").style.display="block";
+  renderMain();
+}
+function showEdit() {
+  document.getElementById("view-main").style.display="none";
+  document.getElementById("view-edit").style.display="block";
+}
+
+function switchTab(name, btn) {
+  ["hoy","historial","grafica"].forEach(t => {
+    document.getElementById("tab-"+t).style.display = t===name ? "block" : "none";
+  });
+  document.querySelectorAll(".seg-btn").forEach(b => b.classList.remove("active"));
+  btn.classList.add("active");
+  if(name==="historial") renderHistorial();
+  if(name==="grafica") renderGrafica();
+}
+
+function renderMain() {
+  const today = getToday();
+  const yesterday = getYesterday();
+  const dayN = getDaysBetween(START_DATE, today)+1;
+  document.getElementById("day-label").textContent = `Plan Carnívoro · Día ${dayN}`;
+  document.getElementById("date-long").textContent = formatDateLong(today);
+
+  const filled = Object.keys(entries).filter(d=>entries[d]?.weight).sort();
+  const lastW = filled.length ? parseFloat(entries[filled[filled.length-1]].weight) : START_WEIGHT;
+  const lost = +(START_WEIGHT-lastW).toFixed(1);
+  const pct = Math.min((lost/GOAL_LOSS)*100,100);
+
+  const todayE = entries[today];
+  document.getElementById("stat-weight").textContent = todayE?.weight || lastW;
+  document.getElementById("stat-lost").textContent = lost>0 ? `-${lost}` : "—";
+  document.getElementById("stat-lost").style.color = lost>0 ? "#34C759" : "#8E8E93";
+  document.getElementById("stat-days").textContent = filled.length;
+  document.getElementById("progress-label").textContent = `${lost>0?lost:0} / 40 kg`;
+  document.getElementById("progress-bar").style.width = `${pct}%`;
+  document.getElementById("progress-sub").textContent = `${pct.toFixed(1)}% · ${Math.max(0,GOAL_LOSS-lost).toFixed(1)} kg restantes`;
+
+  const yestE = entries[yesterday];
+  const yestSleep = yestE?.bedtime;
+  const sleepEl = document.getElementById("yesterday-sleep");
+  sleepEl.textContent = yestSleep || "Agregar";
+  sleepEl.style.color = yestSleep ? "#34C759" : "#007AFF";
+
+  if(todayE?.weight) {
+    document.getElementById("today-empty").style.display="none";
+    document.getElementById("today-filled").style.display="block";
+    document.getElementById("ai-btn-container").style.display="block";
+    document.getElementById("td-weight").textContent = `${todayE.weight} kg`;
+    document.getElementById("td-water").textContent = todayE.water ? `${todayE.water} L` : "—";
+    document.getElementById("td-breakfast").textContent = todayE.breakfast || "—";
+    document.getElementById("td-lunch").textContent = todayE.lunch || "—";
+    document.getElementById("td-energy").textContent = todayE.energy || "—";
+    const enOpt = ENERGY_OPTIONS.find(o=>todayE.energy?.includes(o.label));
+    document.getElementById("td-energy").style.color = enOpt ? enOpt.color : "#8E8E93";
+    document.getElementById("td-wakeup").textContent = todayE.wakeup || "—";
+    const hrs = sleepHours(yestE?.bedtime, todayE.wakeup);
+    document.getElementById("td-sleep").textContent = hrs ? `${hrs} hrs` : "—";
+    if(todayE.notes) {
+      document.getElementById("td-notes-row").style.display="block";
+      document.getElementById("td-notes").textContent = todayE.notes;
+    } else {
+      document.getElementById("td-notes-row").style.display="none";
+    }
+    document.getElementById("btn-register").textContent = "Editar registro de hoy";
+  } else {
+    document.getElementById("today-empty").style.display="block";
+    document.getElementById("today-filled").style.display="none";
+    document.getElementById("ai-btn-container").style.display="none";
+    document.getElementById("btn-register").textContent = "Registrar hoy";
+  }
+}
+
+function renderHistorial() {
+  const today = getToday();
+  const list = document.getElementById("hist-list");
+  list.innerHTML = "";
+  const days = Array.from({length:30},(_,i)=>{
+    const d=new Date(); d.setDate(d.getDate()-i);
+    return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+  }).filter(d=>d>=START_DATE);
+
+  days.forEach((date,idx)=>{
+    const e = entries[date];
+    const isToday = date===today;
+    const en = ENERGY_OPTIONS.find(o=>e?.energy?.includes(o.label));
+    const div = document.createElement("div");
+    div.innerHTML = `
+      <div class="hist-row" onclick="openEdit('${date}')">
+        <div style="flex:1;min-width:0">
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:2px">
+            <p style="font-size:15px;font-weight:500;color:#000;text-transform:capitalize">${formatDateShort(date)}</p>
+            ${isToday?'<span class="today-badge">HOY</span>':''}
+          </div>
+          ${e?.breakfast?`<p style="font-size:12px;color:#FF9500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">🍳 ${e.breakfast}</p>`:''}
+          ${e?.lunch?`<p style="font-size:12px;color:#8E8E93;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">🥩 ${e.lunch}</p>`:''}
+          ${!e?.weight?'<p style="font-size:12px;color:#C7C7CC">Sin registro</p>':''}
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
+          ${e?.weight ? `${en?`<span>${en.emoji}</span>`:''}
+          <p style="font-size:17px;font-weight:600;color:#000">${e.weight} kg</p>` :
+          '<p style="font-size:15px;color:#007AFF">Agregar</p>'}
+          <svg width="7" height="12" viewBox="0 0 7 12" fill="none"><path d="M1 1L6 6L1 11" stroke="#C7C7CC" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+      </div>
+      ${idx<days.length-1?'<div class="sep"></div>':''}
+    `;
+    list.appendChild(div);
+  });
+}
+
+function renderGrafica() {
+  const filled = Object.keys(entries).filter(d=>entries[d]?.weight).sort();
+  if(filled.length<2) {
+    document.getElementById("chart-empty").style.display="block";
+    document.getElementById("chart-filled").style.display="none";
+    return;
+  }
+  document.getElementById("chart-empty").style.display="none";
+  document.getElementById("chart-filled").style.display="block";
+  const lastW = parseFloat(entries[filled[filled.length-1]].weight);
+  const lost = +(START_WEIGHT-lastW).toFixed(1);
+  document.getElementById("chart-current").textContent = `${lastW} kg`;
+  if(lost>0) {
+    document.getElementById("chart-lost-badge").style.display="block";
+    document.getElementById("chart-lost-val").textContent = `−${lost} kg`;
+    document.getElementById("chart-lost-stat").textContent = `−${lost} kg`;
+    document.getElementById("chart-lost-stat").style.color = "#34C759";
+  }
+  document.getElementById("chart-actual-stat").textContent = `${lastW} kg`;
+
+  const vals = filled.map(d=>parseFloat(entries[d].weight));
+  const mn=Math.min(...vals)-2, mx=Math.max(...vals)+2, rng=mx-mn;
+  const n=vals.length, W=300, H=140;
+  const px=i=>12+i*((W-24)/Math.max(n-1,1));
+  const py=v=>10+(1-(v-mn)/rng)*(H-30);
+  const line=vals.map((v,i)=>`${i===0?"M":"L"}${px(i)},${py(v)}`).join(" ");
+  const area=`${line} L${px(n-1)},${H} L${px(0)},${H}Z`;
+  document.getElementById("chart-svg").innerHTML=`
+    <defs><linearGradient id="g1" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#FF3B30" stop-opacity="0.15"/>
+      <stop offset="100%" stop-color="#FF3B30" stop-opacity="0"/>
+    </linearGradient></defs>
+    <line x1="12" y1="${10+0.3*(H-30)}" x2="${W-12}" y2="${10+0.3*(H-30)}" stroke="#E5E5EA" stroke-width="0.5"/>
+    <line x1="12" y1="${10+0.6*(H-30)}" x2="${W-12}" y2="${10+0.6*(H-30)}" stroke="#E5E5EA" stroke-width="0.5"/>
+    <line x1="12" y1="${10+0.9*(H-30)}" x2="${W-12}" y2="${10+0.9*(H-30)}" stroke="#E5E5EA" stroke-width="0.5"/>
+    <path d="${area}" fill="url(#g1)"/>
+    <path d="${line}" fill="none" stroke="#FF3B30" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    ${vals.map((v,i)=>`<circle cx="${px(i)}" cy="${py(v)}" r="4" fill="#fff" stroke="#FF3B30" stroke-width="2"/>
+    <text x="${px(i)}" y="${py(v)-9}" text-anchor="middle" font-size="8" fill="#FF3B30" font-weight="700">${v}</text>`).join("")}
+  `;
+}
+
+function openEdit(date) {
+  currentEditDate = date;
+  selectedEnergy = "";
+  const e = entries[date] || {};
+  document.getElementById("edit-date-title").textContent = formatDateShort(date);
+  document.getElementById("f-weight").value = e.weight || "";
+  document.getElementById("f-water").value = e.water || "";
+  document.getElementById("f-breakfast").value = e.breakfast || "";
+  document.getElementById("f-lunch").value = e.lunch || "";
+  document.getElementById("f-bedtime").value = e.bedtime || "";
+  document.getElementById("f-wakeup").value = e.wakeup || "";
+  document.getElementById("f-notes").value = e.notes || "";
+  selectedEnergy = e.energy || "";
+  updateSleepCalc();
+  renderEnergyList();
+  const delBtn = document.getElementById("delete-btn-container");
+  delBtn.style.display = e.weight ? "block" : "none";
+  showEdit();
+}
+
+function renderEnergyList() {
+  const list = document.getElementById("energy-list");
+  list.innerHTML = "";
+  ENERGY_OPTIONS.forEach((opt,i)=>{
+    const active = selectedEnergy===`${opt.emoji} ${opt.label}`;
+    const div = document.createElement("div");
+    div.innerHTML = `
+      <div class="energy-option${active?' active':''}" onclick="selectEnergy('${opt.emoji} ${opt.label}')">
+        <span style="font-size:15px;color:${active?opt.color:'#000'}">${opt.emoji} ${opt.label}</span>
+        ${active?`<svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M3 9L7.5 13.5L15 5" stroke="#007AFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`:''}
+      </div>
+      ${i<ENERGY_OPTIONS.length-1?'<div class="sep"></div>':''}
+    `;
+    list.appendChild(div);
+  });
+}
+
+function selectEnergy(val) {
+  selectedEnergy = val;
+  renderEnergyList();
+}
+
+function updateSleepCalc() {
+  const bed = document.getElementById("f-bedtime").value;
+  const wake = document.getElementById("f-wakeup").value;
+  const hrs = sleepHours(bed,wake);
+  const el = document.getElementById("sleep-calc");
+  if(hrs) {
+    el.style.display="block";
+    document.getElementById("sleep-calc-val").textContent = `${hrs} hrs`;
+  } else {
+    el.style.display="none";
+  }
+}
+
+function saveEntry() {
+  const entry = {
+    date: currentEditDate,
+    weight: document.getElementById("f-weight").value,
+    water: document.getElementById("f-water").value,
+    breakfast: document.getElementById("f-breakfast").value,
+    lunch: document.getElementById("f-lunch").value,
+    bedtime: document.getElementById("f-bedtime").value,
+    wakeup: document.getElementById("f-wakeup").value,
+    notes: document.getElementById("f-notes").value,
+    energy: selectedEnergy,
+  };
+  entries[currentEditDate] = entry;
+  saveEntries();
+  showMain();
+}
+
+function deleteEntry() {
+  delete entries[currentEditDate];
+  saveEntries();
+  showMain();
+}
+
+async function runAnalysis() {
+  const today = getToday();
+  const todayE = entries[today];
+  if(!todayE?.weight) return;
+  document.querySelector(".btn-ai").disabled=true;
+  document.querySelector(".btn-ai").textContent="✨ Analizando tu día...";
+  document.getElementById("ai-loading").style.display="block";
+  document.getElementById("ai-result").style.display="none";
+
+  const yesterday = getYesterday();
+  const yestE = entries[yesterday];
+  const filled = Object.keys(entries).filter(d=>entries[d]?.weight).sort();
+  const prevWeights = filled.filter(d=>d!==today).slice(-7).map(d=>`${d}: ${entries[d].weight}kg`).join(", ");
+  const hrs = sleepHours(yestE?.bedtime, todayE.wakeup);
+
+  const prompt = `Eres un coach de salud experto en dieta carnívora y ayuno 16:8. Analiza este registro y da retroalimentación directa y motivadora en español.
+
+DATOS:
+- Fecha: ${todayE.date}
+- Peso: ${todayE.weight||"No registrado"} kg (inicio: 170kg, meta: -40kg)
+- Agua: ${todayE.water||"No registrado"} litros
+- Desayuno 11am: ${todayE.breakfast||"No registrado"}
+- Almuerzo 3pm: ${todayE.lunch||"No registrado"}
+- Energía: ${todayE.energy||"No registrada"}
+- Dormí: ${yestE?.bedtime||"No registrado"}
+- Me levanté: ${todayE.wakeup||"No registrado"}
+- Horas sueño: ${hrs?hrs+" hrs":"No calculable"}
+- Notas: ${todayE.notes||"Ninguna"}
+- Historial peso: ${prevWeights||"Sin historial"}
+CONTEXTO: Dieta carnívora estricta, ayuno 16:8, triglicéridos altos mejorando.
+
+Responde SOLO JSON sin markdown:
+{"score":8,"titulo":"Día sólido","resumen":"Resumen en 1-2 oraciones","positivo":["punto 1","punto 2"],"mejorar":["cosa 1","cosa 2"],"consejo":"Consejo para mañana","emoji":"🔥"}`;
+
+  try {
+    const resp = await fetch("https://api.anthropic.com/v1/messages",{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:800,messages:[{role:"user",content:prompt}]})
+    });
+    const data = await resp.json();
+    const text = data.content?.[0]?.text||"";
+    const clean = text.replace(/```json|```/g,"").trim();
+    const result = JSON.parse(clean);
+    renderAnalysis(result);
+  } catch(e) {
+    document.getElementById("ai-result").innerHTML=`<div class="card" style="padding:16px;margin-bottom:12px"><p style="font-size:14px;color:#FF3B30;text-align:center">No se pudo generar el análisis. Intenta de nuevo.</p></div>`;
+    document.getElementById("ai-result").style.display="block";
+  }
+  document.getElementById("ai-loading").style.display="none";
+  document.querySelector(".btn-ai").disabled=false;
+  document.querySelector(".btn-ai").textContent="✨ Analizar mi día con IA";
+}
+
+function renderAnalysis(r) {
+  const scoreColor = r.score>=8?"#34C759":r.score>=6?"#FF9500":"#FF3B30";
+  const scoreLabel = r.score>=8?"Excelente":r.score>=6?"Bien":"A mejorar";
+  document.getElementById("ai-result").innerHTML=`
+    <div class="score-card" style="background:${scoreColor}">
+      <p style="font-size:48px;margin-bottom:4px">${r.emoji}</p>
+      <p style="font-size:13px;color:rgba(255,255,255,0.8);font-weight:600;letter-spacing:0.3px;text-transform:uppercase;margin-bottom:6px">${scoreLabel}</p>
+      <p style="font-size:22px;font-weight:700;color:#fff;letter-spacing:-0.3px;margin-bottom:6px">${r.titulo}</p>
+      <div style="display:flex;justify-content:center;align-items:baseline;gap:4px">
+        <span style="font-size:48px;font-weight:900;color:#fff;letter-spacing:-2px">${r.score}</span>
+        <span style="font-size:20px;color:rgba(255,255,255,0.7)">/10</span>
+      </div>
+      <p style="font-size:14px;color:rgba(255,255,255,0.9);margin-top:8px;line-height:1.5">${r.resumen}</p>
+    </div>
+    <div class="analysis-section">
+      <p style="font-size:13px;font-weight:700;color:#34C759;letter-spacing:0.3px;text-transform:uppercase;margin-bottom:10px">✅ Lo que hiciste bien</p>
+      ${r.positivo.map(p=>`<div style="display:flex;gap:8px;margin-bottom:8px"><span style="color:#34C759;flex-shrink:0">•</span><p style="font-size:15px;color:#000;line-height:1.4">${p}</p></div>`).join("")}
+    </div>
+    <div class="analysis-section">
+      <p style="font-size:13px;font-weight:700;color:#FF9500;letter-spacing:0.3px;text-transform:uppercase;margin-bottom:10px">⚠️ A mejorar</p>
+      ${r.mejorar.map(m=>`<div style="display:flex;gap:8px;margin-bottom:8px"><span style="color:#FF9500;flex-shrink:0">•</span><p style="font-size:15px;color:#000;line-height:1.4">${m}</p></div>`).join("")}
+    </div>
+    <div class="analysis-tip">
+      <p style="font-size:13px;font-weight:700;color:#007AFF;letter-spacing:0.3px;text-transform:uppercase;margin-bottom:8px">💡 Para mañana</p>
+      <p style="font-size:15px;color:#000;line-height:1.5">${r.consejo}</p>
+    </div>
+  `;
+  document.getElementById("ai-result").style.display="block";
+}
+
+// INIT
+loadEntries();
+showMain();
+</script>
+</body>
+</html>
